@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Living Story Sandbox RPG — a living fantasy sandbox where story is the primary attraction." />
+  <title>Living Story Sandbox RPG</title>
+
+  <!-- Tailwind v4 browser build -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- marked.js for markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
+
+  <!-- Site styles -->
+  <link rel="stylesheet" href="shared.css" />
+
+  <!-- Prevent FOUC for dark mode -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('lss-theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Mobile hamburger button -->
+  <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="3" y1="5" x2="17" y2="5"/>
+      <line x1="3" y1="10" x2="17" y2="10"/>
+      <line x1="3" y1="15" x2="17" y2="15"/>
+    </svg>
+  </button>
+
+  <!-- Mobile overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="site-layout">
+    <!-- Sidebar navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a class="brand" href="#">Living Story Sandbox RPG</a>
+        <div class="sidebar-controls">
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span class="icon-moon">&#9789;</span>
+            <span class="icon-sun">&#9788;</span>
+          </button>
+        </div>
+      </div>
+      <ul class="nav-list" id="nav-list" role="navigation" aria-label="Page navigation">
+        <!-- Built by shared.js -->
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main-area">
+      <main id="content" class="content-wrap">
+        <div class="loading-spinner">Loading...</div>
+      </main>
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <span>Living Story Sandbox RPG</span>
+          <span>Design documentation bundle</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Site logic -->
+  <script src="shared.js"></script>
+</body>
+</html>
