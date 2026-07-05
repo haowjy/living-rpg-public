@@ -1,15 +1,17 @@
 # Living Story Sandbox RPG
 
-A fantasy sandbox RPG where the entire game engine is an LLM agent loop over a file system. No scripted quests, no dialogue trees. The LLM reads world state from files, narrates, calls tools to mutate state, and loops.
+A fantasy sandbox RPG where the world remembers what the player does, and that history can later reshape techniques, relationships, rumors, factions, and shrine breakthroughs.
 
 **[Read the full proposal →](https://haowjy.github.io/living-rpg-public/)**
 
 ## Key ideas
 
-- **Agent-loop-over-files** — no rigid pipeline, the LLM is the engine
-- **Insight spellcraft** — players make spells from the story they lived
-- **Chunk-based worldgen** — Minecraft-style generation with LLM semantic enrichment
-- **V0** = agents + skills with a deterministic tool layer (terminal play) → **V1** = 2.5D Godot game
+- **World state as files** — the event log, characters, areas, rumors, factions, and techniques are inspectable source-of-truth files.
+- **LLM meaning layer + deterministic tools** — the LLM narrates, interprets, and proposes; tools validate what becomes real.
+- **Technique mastery** — learn techniques from manuals and other sources, gain proficiency through use or practice, then evolve mastered forms with references, combinations, and player-written ideas.
+- **Shrine breakthroughs** — shrines, statues, and altars upgrade the player's base path, element, bonuses, and the weirdness ceiling for later evolutions.
+- **Chunk-based worldgen** — Minecraft-like exploration structure with authored prefab chunks and LLM semantic enrichment.
+- **V0 → V1** — first prove the agent loop in a terminal package; then render the same backend through a 2.5D Godot client.
 
 ## Related repos
 
