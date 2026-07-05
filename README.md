@@ -9,7 +9,7 @@ A fantasy sandbox RPG where the entire game engine is an LLM agent loop over a f
 - **Agent-loop-over-files** — no rigid pipeline, the LLM is the engine
 - **Insight spellcraft** — players make spells from the story they lived
 - **Chunk-based worldgen** — Minecraft-style generation with LLM semantic enrichment
-- **V0** = agents + skills on Claude Code (terminal play) → **V1** = 2.5D Godot game
+- **V0** = agents + skills with a deterministic tool layer (terminal play) → **V1** = 2.5D Godot game
 
 ## Related repos
 

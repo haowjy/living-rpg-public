@@ -2,17 +2,27 @@
 
 Make your own spells from the story you lived. Every run produces techniques no other player found, because no other player lived the same history.
 
+## Insight Sources
+
+Insights come from three places:
+
+**Lived experience** — surviving an ambush, sparing an enemy, meditating in a ruin. Not every event produces an insight — only moments with emotional or narrative weight.
+
+**Manuals** — technique scrolls, martial arts texts, and meditation guides found in the world. Study them to gain structured insights. A swordsmanship manual means more to a player who has actually fought — manuals combine with lived experience for deeper understanding.
+
+**Player-written** — type your own insights in free text. Combine what you learned from a manual with what you experienced in the game. Articulate your own understanding and the system turns it into technique advancement.
+
 ## The Pipeline
 
-Five stages turn lived experience into combat abilities.
+Five stages turn insights into combat abilities and mana rank advancement.
 
 ### 1. Event
 
-Something meaningful happens. Survived an ambush, spared an enemy, founded a company, meditated in a ruin. The game logs it as a structured event via `write_event`.
+Something meaningful happens. Survived an ambush, found a technique scroll, trained with a master, meditated in a ruin. The game logs it as a structured event via `write_event`.
 
 ### 2. Insight
 
-The game distills the experience into a named insight. Not every event produces one -- only moments with emotional or narrative weight. A routine bandit fight does not generate an insight. Surviving a coordinated pack ambush alone, outnumbered, reading animal movement to stay alive -- that does.
+The game distills the experience into a named insight, or the player writes their own. A routine bandit fight does not generate an insight. Surviving a coordinated pack ambush alone, outnumbered, reading animal movement to stay alive -- that does. Finding a martial arts manual and studying it after that fight -- that deepens the insight further.
 
 ### 3. Proposal
 
@@ -55,6 +65,12 @@ Techniques assemble from a fixed vocabulary of composable primitives:
 `dash` `damage` `push` `pull` `shield` `bind` `mark` `reveal` `summon` `terrain change` `morale buff` `fear pressure` `reputation shift` `faction aura` `dialogue unlock` `oath condition` `cooldown` `range` `cost` `tier` `escalation risk`
 
 The LLM proposes creative combinations. The tools validate balance before a technique becomes real. A technique is always a subset of this vocabulary -- no freeform effects, no unvalidated mechanics.
+
+## Mana Rank
+
+Insights don't just create techniques — they advance your mana cultivation rank. Rank is tiered with breakthroughs: accumulate enough insights, then pass a challenge or trial to break through to the next tier. Higher rank means stronger techniques, greater mana capacity, and access to more powerful primitive combinations.
+
+Think cultivation progression in a medieval fantasy world. The player is literally cultivating their understanding of the world through experience, study, and reflection — and that cultivation translates into real power.
 
 ## Why This Works
 

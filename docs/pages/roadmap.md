@@ -6,7 +6,7 @@ Two versions. Same agent backend. V0 proves the engine in a terminal. V1 gives i
 
 ### V0 -- Agent Prototype
 
-A set of agents and skills running on [opencode](https://github.com/sst/opencode) / [meridian-prompter](https://github.com/haowjy/meridian-prompter). No custom code -- the entire game is prompt architecture, tool definitions, and structured world state files.
+A set of agents and skills running on [opencode](https://github.com/sst/opencode) / [meridian-prompter](https://github.com/haowjy/meridian-prompter), backed by a small deterministic tool layer. The creative layer is prompt architecture and agents; canonical state changes, validation, indexing, and replayable logs belong to tools.
 
 The player types free text. The LLM interprets intent, narrates outcomes, and calls tools to mutate world state. Narrative DM mode -- think a tabletop GM that never forgets, never contradicts itself, and runs a living world behind the screen.
 
@@ -31,6 +31,7 @@ The vertical slice is the minimum playable proof: one starting area, enough NPCs
 | Validator agent | Consistency checking -- rejects contradictions before they enter state |
 | NPC agents | One agent per named character, acting from their own knowledge and goals |
 | World state files | Structured directory of prose and data (see [How It Works](#how-it-works)) |
+| Tool layer | Deterministic mutation, validation, projections, and index rebuilds |
 
 ### Tools
 
@@ -41,7 +42,10 @@ change_relationship(source_id, target_id, delta, reason)
 spread_rumor(rumor_id, from_area, to_area)
 claim_site(faction_id, area_id)
 create_quest_thread(quest)
+create_technique(proposal)
 ```
+
+The first implementation target is deliberately concrete: event schemas, knowledge boundaries, rumor provenance, pressure scoring, and technique budgets must all be inspectable in state files.
 
 ### Starting Content
 
@@ -94,11 +98,9 @@ Two existing open-source projects provide the foundation.
 
 ## How to Follow
 
-The project is open source: **[github.com/haowjy/cultivation-rpg](https://github.com/haowjy/cultivation-rpg)**
+The project is open source: **[github.com/haowjy/living-rpg](https://github.com/haowjy/living-rpg)**
 
 Contributions welcome -- especially around agent architecture, world state design, tool validation, and Godot integration. Open an issue or start a discussion.
-
-For context on the design and early feedback, see the [forum post discussion](../forum_post.md).
 
 ## Further Reading
 

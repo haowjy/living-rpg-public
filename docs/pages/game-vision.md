@@ -25,17 +25,15 @@ The Demon King scales alongside the player. As the player grows from nobody to l
 
 The origin — who created it, why, whether it can be reversed — is a late-game discovery that recontextualizes the early game. The player spends act one thinking the world is just politically unstable. Act two reveals something is accelerating the collapse on purpose.
 
-## Legend Path
+## Cultivation Path
 
-Personal power progression through five stages that emerge from play, not gated checkpoints:
+Power progression through mana cultivation — tiered ranks with breakthrough moments, driven by [insight spellcraft](#insight-spellcraft).
 
-1. **Nobody** — Weak stats, no skills, no reputation. The world ignores you.
-2. **Survivor** — Core combat and survival skills developing. You can handle common threats.
-3. **Specialist** — Deep technique tree or broad skill coverage. NPCs recognize your name.
-4. **Force** — Personal power reshapes local events. Factions court or fear you.
-5. **Legend** — History bends around you. Your techniques, choices, and reputation define an era.
+Insights come from lived experience, discovered manuals (technique scrolls, martial arts texts, meditation guides), and player-written reflections. Accumulate enough understanding, then face a breakthrough challenge — a trial, revelation, or crisis — to advance to the next rank. Higher rank unlocks stronger techniques and deeper mana capacity.
 
-Relationships are a growth channel, not a requirement. Players who want allies, factions, and political leverage can pursue them. Players who want to solo the world as a wandering swordsman can do that too. The system tracks relationships when they form but does not gate progression on social investment.
+The progression feels like cultivation in a medieval fantasy world. The player grows by fighting, studying, and reflecting — not by filling an XP bar.
+
+Relationships are a growth channel, not a requirement. Players who want allies, factions, and political leverage can pursue them. Players who want to solo the world as a wandering swordsman can do that too.
 
 ## Combat
 
