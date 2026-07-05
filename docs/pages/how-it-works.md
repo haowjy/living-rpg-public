@@ -1,10 +1,10 @@
 # How It Works
 
-The game engine is an LLM agent loop over a structured file system. The LLM reads world state from files, writes narration as free text, and calls tools when state needs to change. There is no scripting language, no behavior tree compiler, no event bus. Files are the world. The loop is the engine.
+The game engine is an LLM agent loop over a structured file system. The LLM reads world state from files, writes narration as free text, and calls tools when state needs to change. Files are the world. The loop is the engine.
 
 ## The Agent Loop
 
-```
+```text
 read world state (files + search index)
   → observe (what changed, what's nearby, what's pressured)
   → think/write (narration, dialogue, scene prose)
@@ -16,16 +16,20 @@ The LLM's primary output is prose. Structured JSON is only used for state mutati
 
 The loop runs continuously during play. Each iteration reads the current world state, identifies what matters right now (proximity, pressure, unresolved tension), generates prose for the player, and fires tool calls to record what happened. The next iteration reads the updated state and continues.
 
-This is a single architecture that replaces what traditional engines split across a dozen subsystems: map tracking, story sifting, NPC scheduling, narration, validation, content compilation. Here it is four components:
+This is a single architecture with four components:
 
 1. **Files** -- world state as a structured directory of prose and data.
 2. **Index** -- FTS + vector search over those files for retrieval.
 3. **Tools** -- named functions for state mutations, each with built-in validation.
 4. **Loop** -- the LLM agent reads, thinks, writes, calls tools, repeats.
 
+## What a Consequence Looks Like
+
+The player spares a raider. `write_event` records the witnesses. A rumor carrier reaches the hub. An NPC who hears the rumor reacts later, not because the model has omniscient knowledge, but because the rumor reached their area. If the player later evolves a mercy-themed binding technique, that event can be retrieved as context — but it does not automatically grant a spell.
+
 ## Agents and Skills
 
-The game is built on the same architecture as [creative-writing-skills](https://github.com/haowjy/creative-writing-skills) -- a set of agents and skills that compose into a session. Agents and skills map directly from creative writing to game engine:
+The game is built on the same architecture as creative-writing-skills -- a set of agents and skills that compose into a session. Agents and skills map directly from creative writing to game engine:
 
 | Creative writing | Game engine |
 |---|---|
@@ -37,84 +41,61 @@ The game is built on the same architecture as [creative-writing-skills](https://
 | Story memory (fact extraction) | Event log (what happened) |
 | Vocab / shared-dao | World lore, canonical terms |
 
-The game runs on [meridian-prompter](https://github.com/haowjy/meridian-prompter) -- the same agent/skill runtime the creative-writing plugin uses. A Game Director agent manages the loop: it reads world state, dispatches to the Narrator for prose, consults the Validator for consistency, and invokes NPC agents when characters need to act autonomously.
+A Game Director agent manages the loop: it reads world state, dispatches to the Narrator for prose, consults the Validator for consistency, and invokes NPC agents when characters need to act autonomously.
 
 ## World State as Files
 
 World state lives as markdown files in a structured directory. The LLM reads them directly as context. An index layer (FTS + vector) provides search when the agent needs to find relevant content across the world.
 
-```
+```text
 world/
-  world.md                 # setting overview, current era, active pressures
-  clock.md                 # current day/hour, pending ticks
-
+  world.md
+  clock.md
   areas/
-    greyford/
-      area.md              # description, control, exits, tags
-      recent-events.md     # what happened here lately
-      rumors.md            # what information has reached this place
-      npcs-present.md      # who is here right now
-      districts/
-        market/
-        church-hospital/
-        adventurers-guild/
-    north-mill/
-    red-sash-camp/
-    abandoned-shrine/
-
   characters/
-    player.md              # stats, inventory, skills, history
-    mara-guild-clerk.md
-    tomas-rival.md
-    sister-elian.md
-
   factions/
-    vael-lordship.md
-    church-of-the-seal.md
-    red-sash-bandits.md
-
   quests/
-    reclaim-north-mill.md
-
+  rumors/
+  techniques/
+  shrines/
   events/
-    log.md                 # append-only record of what happened
-
-  index/                   # FTS + vector search (derived, rebuildable)
+  index/
 ```
 
-The file system is the world. If the LLM can read a file, it knows that thing. If no file exists, that thing has not been established. Files are prose by default -- the LLM reads and writes in the same format. Structured data (stats, coordinates, relationship values) lives in fenced blocks within markdown where precision matters.
+The file system is the world. If the LLM can read a file, it knows that thing. If no file exists, that thing has not been established. Files are prose by default. Structured data lives in fenced blocks within markdown where precision matters.
 
 ### State Mutations via Tools
 
 State changes happen through tool calls, not by the LLM editing files directly. The LLM proposes a call; the tool validates inputs against current world state and either executes or rejects.
 
-```
+```text
 move_character(character_id, destination_area)
 write_event(event)
 change_relationship(source_id, target_id, delta, reason)
 spread_rumor(rumor_id, from_area, to_area)
 claim_site(faction_id, area_id)
 create_quest_thread(quest)
+record_training(technique_id, context)
+evolve_technique(proposal)
+attempt_breakthrough(shrine_id)
 ```
 
-If a tool call references an invalid location, a character who is not present, or a faction that does not exist, the tool rejects it. This is how the engine enforces consistency without a separate rules engine -- validation lives inside the tools themselves.
+If a tool call references an invalid location, a character who is not present, a technique the player does not know, or a shrine that cannot be reached, the tool rejects it. This is how the engine enforces consistency without asking the LLM to self-police every detail.
 
 ### Index Layer
 
 | Index type | Purpose |
 |---|---|
-| Full-text search | Find events, characters, or locations by name or keyword |
-| Vector search | Find thematically related content ("betrayal" surfaces relevant events even if the word was never used) |
+| Full-text search | Find events, characters, techniques, or locations by name or keyword |
+| Vector search | Find thematically related content: betrayal, mercy, fire, fear, oath, rivalry |
 
 The index is a derived projection of the files. It can be rebuilt from the directory at any time. It is never the source of truth.
 
 ## NPC Agents
 
-Named NPCs are autonomous agents, not dialogue trees. Each NPC has goals, memory, relationships, a schedule, and the ability to act. They use the character-sim pattern from the creative-writing plugin -- the LLM speaks in character from the NPC's knowledge, voice, and emotional state.
+Named NPCs are autonomous agents, not dialogue trees. Each NPC has goals, memory, relationships, a schedule, and the ability to act. They use the character-sim pattern: the LLM speaks in character from the NPC's knowledge, voice, and emotional state.
 
-Each agent follows the cycle: **goal -> memory -> relationship -> plan -> action -> consequence**.
-
-The critical constraint: NPCs act on what *they* know, not what the player knows. A guard captain does not react to a murder she has not heard about. A merchant adjusts prices based on the supply disruption he has witnessed, not on events three areas away. Knowledge boundaries are enforced by what files the NPC agent can read -- if the information has not reached their area (via events, rumors, or direct witness), it does not exist for them.
+The critical constraint: NPCs act on what *they* know, not what the player knows. A guard captain does not react to a murder she has not heard about. A merchant adjusts prices based on the supply disruption he has witnessed, not on events three areas away. Knowledge boundaries are enforced by what files the NPC agent can read.
 
 NPCs act during wait, travel, rest, and world ticks. Their actions produce events, not atmosphere:
 
@@ -125,9 +106,9 @@ NPCs act during wait, travel, rest, and world ticks. Their actions produce event
 - Claim credit for an outcome
 - Shift faction resources or control
 
-These actions feed back into the event log, creating new pressure that the [story system](#story-system) surfaces as playable situations.
+These actions feed back into the event log, creating new pressure that the story system surfaces as playable situations.
 
-### Layered Simulation
+## Layered Simulation
 
 Simulation detail scales with proximity to the player. Distant events tick coarsely; the player's immediate area runs at full richness.
 
@@ -138,7 +119,7 @@ Simulation detail scales with proximity to the player. Distant events tick coars
 | Town/city | Higher | Prices shift, guards crack down, rumors spread |
 | Active local area | Rich | Named NPCs scheme, argue, move, confront, betray |
 
-Global and regional events create the pressure that drives local story. A distant war produces refugees; refugees create food pressure in Greyford; food pressure makes the mill dispute matter.
+Global and regional events create the pressure that drives local story. A distant war produces refugees; refugees create food pressure in the starting region; food pressure makes a mill dispute matter.
 
 ## Story System
 
@@ -148,15 +129,7 @@ The story system generates playable situations from local pressure. There are no
 
 Story pressure is unresolved tension attached to places, people, and factions. The system surfaces pressure that is local, timely, and connected to prior events.
 
-Pressure accumulates from events. When enough pressure builds around a cluster of characters, locations, and factions, the story system proposes a scene. A rivalry forming. A village ready to rebel. A faction losing legitimacy after a public failure. A rumor reaching the wrong person.
-
-### LLM-Driven Sifting
-
-The LLM reads the event stream and proposes emerging patterns as story threads. Sifting is flexible and LLM-driven -- there are no rigid pattern-matching rules.
-
-Repeated public conflict between the player and Tomas becomes a rivalry thread. A spared bandit plus food shortage plus weak lordship control becomes a recruitment or rebellion thread. The LLM notices these patterns because it reads the full event context, not because a rule fires on specific event types.
-
-When a pattern has enough recurrence, stakes, and actors, the system promotes it into a quest thread via `create_quest_thread`.
+Pressure accumulates from events. When enough pressure builds around a cluster of characters, locations, and factions, the story system proposes a scene: a rivalry forming, a village ready to rebel, a faction losing legitimacy after a public failure, or a rumor reaching the wrong person.
 
 ### Scene Generation with Validation
 
@@ -173,11 +146,9 @@ Every scene is grounded by validation checks, enforced by the tools:
 |---|---|
 | Presence | NPC acts in a scene but is not at this location |
 | Knowledge | Character reacts to information they have not received |
-| Rules | Illegal state changes (impossible rewards, broken locations) |
+| Rules | Illegal state changes |
 | Causality | Scene contradicts prior events or has no pressure driving it |
 | Scope | Scene references events or actors too far from the player's area |
-
-If `write_event` receives a reference to a character who is not present, the tool rejects the call. The LLM does not need to self-police consistency -- the tools do it.
 
 ## Failure Handling
 
@@ -185,18 +156,16 @@ LLM output is unreliable by nature. The engine assumes failures will happen and 
 
 | Concern | Approach |
 |---|---|
-| JSON validity | Constrained decoding (JSON mode) -- the model cannot produce malformed tool calls |
-| Semantic validation | Tool-level checks (presence, knowledge, rules, causality, scope) |
+| JSON validity | Constrained decoding when structured output is needed |
+| Semantic validation | Tool-level checks |
 | Tool rejection | Retry once with the error message as context |
 | Retry failure | Fall back to a template appropriate to the scene type |
 
-The retry-then-fallback pattern means the game never crashes on a bad generation. A rejected tool call gets one retry with the rejection reason included in context. If the retry also fails, the engine uses a pre-written template for that scene type (combat outcome, dialogue beat, travel description) and logs the failure for debugging.
-
-This is not graceful degradation in the "show an error dialog" sense. The player sees a slightly less creative scene. The world state stays consistent because the tools never accepted the invalid mutation.
+The retry-then-fallback pattern means the game never crashes on a bad generation. A rejected tool call gets one retry with the rejection reason included in context. If the retry also fails, the engine uses a pre-written template and logs the failure for debugging.
 
 ## Further Reading
 
 - [Game Vision](#game-vision) -- world, era model, combat, progression
-- [Insight Spellcraft](#insight-spellcraft) -- the spell system built on this engine
+- [Technique Mastery](#technique-mastery) -- learn, practice, evolve, and break through
 - [World Generation](#world-generation) -- how the world bootstraps from nothing
 - [Roadmap](#roadmap) -- what we are building and when
