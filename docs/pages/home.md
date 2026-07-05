@@ -43,7 +43,7 @@ Events do not automatically hand out spells. Events become context. Training bui
 
 ![Combat](assets/combat.png)
 
-*Use techniques in real-time action combat*
+*Fight through turn-based party combat with position, stress, wounds, and techniques*
 
 </div>
 
