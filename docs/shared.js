@@ -12,9 +12,9 @@
   var PAGES = [
     { slug: 'home',               title: 'Home',               desc: 'The pitch' },
     { slug: 'game-vision',        title: 'Game Vision',        desc: 'World, combat, progression' },
+    { slug: 'technique-mastery',  title: 'Technique Mastery',  desc: 'Learn, practice, evolve' },
     { slug: 'how-it-works',       title: 'How It Works',       desc: 'Agent architecture and systems' },
     { slug: 'world-generation',   title: 'World Generation',   desc: 'Chunk-based procedural worlds' },
-    { slug: 'insight-spellcraft', title: 'Insight Spellcraft', desc: 'Make spells from your story' },
     { slug: 'roadmap',            title: 'Roadmap',            desc: 'V0, V1, and how to build this' }
   ];
 
@@ -218,59 +218,28 @@
   }
 
   /* ----------------------------------------------------------
-     Hash routing
+     Router
      ---------------------------------------------------------- */
   function getSlugFromHash() {
-    var hash = window.location.hash.replace(/^#/, '');
-    if (!hash) return DEFAULT_PAGE;
-    /* Validate that slug is known */
-    for (var i = 0; i < PAGES.length; i++) {
-      if (PAGES[i].slug === hash) return hash;
-    }
-    return hash; /* allow unknown slugs — will show error if file doesn't exist */
+    var raw = window.location.hash ? window.location.hash.slice(1) : '';
+    return raw || DEFAULT_PAGE;
   }
 
-  function onHashChange() {
+  function handleRoute() {
     var slug = getSlugFromHash();
-    loadPage(slug);
+    var known = PAGES.some(function (p) { return p.slug === slug; });
+    loadPage(known ? slug : DEFAULT_PAGE);
   }
 
   /* ----------------------------------------------------------
      Init
      ---------------------------------------------------------- */
-  function init() {
-    initTheme();
-    buildNav();
+  initTheme();
+  buildNav();
+  handleRoute();
 
-    /* Theme toggle */
-    themeToggleEl.addEventListener('click', toggleTheme);
-
-    /* Mobile nav */
-    hamburgerEl.addEventListener('click', toggleMobileNav);
-    overlayEl.addEventListener('click', closeMobileNav);
-
-    /* Close mobile nav on Escape */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && sidebarEl.classList.contains('open')) {
-        closeMobileNav();
-      }
-    });
-
-    /* Hash routing */
-    window.addEventListener('hashchange', onHashChange);
-
-    /* Set initial hash if none */
-    if (!window.location.hash) {
-      window.location.hash = '#' + DEFAULT_PAGE;
-    } else {
-      onHashChange();
-    }
-  }
-
-  /* Wait for DOM */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (themeToggleEl) themeToggleEl.addEventListener('click', toggleTheme);
+  if (hamburgerEl) hamburgerEl.addEventListener('click', toggleMobileNav);
+  if (overlayEl) overlayEl.addEventListener('click', closeMobileNav);
+  window.addEventListener('hashchange', handleRoute);
 })();
